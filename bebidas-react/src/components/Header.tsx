@@ -7,6 +7,7 @@ export default function Header() {
     const fetchCategiries = useAppStore((state) => state.fetchCategiries)
     const categories = useAppStore((state) => state.categories)
     const searchRecipies = useAppStore((state) => state.searchRecipies)
+    const showNotification = useAppStore((state) => state.showNotification)
 
     useEffect(() => {
         fetchCategiries()
@@ -26,7 +27,9 @@ export default function Header() {
     }
     const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault()
+
         if (Object.values(searchFilters).includes('')) {
+            showNotification({text: 'Todos los campos son obligatorios', error: true})
             console.log('Todos los campos son obligatorios');
             return
         }
@@ -48,6 +51,10 @@ export default function Header() {
                         <NavLink to={"/favoritos"}
                             className={({ isActive }) => (isActive ? "text-orange-500 uppercase font-bold" : "text-white uppercase font-bold")}
                         >Favoritos</NavLink>
+                         <NavLink to={"/generate"}
+                            className={({ isActive }) => (isActive ? "text-orange-500 uppercase font-bold" : "text-white uppercase font-bold")}
+                        >Generar con IA</NavLink>
+
 
                     </nav>
                 </div>
