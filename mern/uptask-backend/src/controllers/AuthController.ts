@@ -4,6 +4,7 @@ import {checkpassword, hashPassword} from "../utils/auth";
 import Token from "../models/Token";
 import {generateToken} from "../utils/token";
 import {AuthEmail} from "../emails/AuthEmail";
+import {generateJWT} from "../utils/jwt";
 
 
 export class AuthController {
@@ -93,8 +94,9 @@ export class AuthController {
                 const error = new Error('password incorrecta ')
                 return res.status(401).json({error: error.message})
             }
+            const token = generateJWT({id: user.id})
 
-            res.send('Autenticado')
+            res.send(token)
         } catch (e) {
             res.send(500).json({error: 'Hubo un error'})
         }
@@ -156,6 +158,49 @@ export class AuthController {
             })
 
             res.send('revisa tu email para instrucciones')
+        } catch (e) {
+            res.send(500).json({error: 'Hubo un error'})
+        }
+
+    }
+
+    static validateToken = async (req: Request, res: Response) => {
+        try {
+            const {token} = req.body
+
+            const tokenExists = await Token.findOne({token})
+            if (!tokenExists) {
+                const error = new Error('Token no valido')
+                return res.status(404).json({error: error.message})
+            }
+
+            res.send('Token valido, define tu nuevo password')
+            console.log(tokenExists)
+        } catch (e) {
+            res.send(500).json({error: 'Hubo un error'})
+        }
+
+    }
+
+    static updatePasswordWithToken = async (req: Request, res: Response) => {
+        try {
+            const {token} = req.params
+            const {password} = req.body
+
+
+            const tokenExists = await Token.findOne({token})
+            if (!tokenExists) {
+                const error = new Error('Token no valido')
+                return res.status(404).json({error: error.message})
+            }
+
+            const user = await User.findById(tokenExists.user)
+            user.password = await hashPassword(password)
+
+            await Promise.allSettled([user.save(), tokenExists.deleteOne()])
+
+            res.send('El password se modifico correctamente')
+            console.log(tokenExists)
         } catch (e) {
             res.send(500).json({error: 'Hubo un error'})
         }
