@@ -3,9 +3,9 @@ import {isAxiosError} from "axios";
 import {
     ConfirmToken,
     ForgotPasswordForm, NewPasswordForm,
-    RequestConfirmationCodeForm,
+    RequestConfirmationCodeForm, User,
     UserLoginForm,
-    UserRegistrationForm
+    UserRegistrationForm, userSchema
 } from "@/types/index.ts";
 
 export async function createAccount(formData: UserRegistrationForm) {
@@ -14,7 +14,7 @@ export async function createAccount(formData: UserRegistrationForm) {
         const {data} = await api.post<string>(url, formData)
         return data;
     } catch (e) {
-        if (isAxiosError(e) && e.message)
+        if (isAxiosError(e) && e.response)
             throw new Error(e.response.data.error)
     }
 }
@@ -25,7 +25,7 @@ export async function confirmAccount(formData: ConfirmToken) {
         const {data} = await api.post<string>(url, formData)
         return data;
     } catch (e) {
-        if (isAxiosError(e) && e.message)
+        if (isAxiosError(e) && e.response)
             throw new Error(e.response.data.error)
     }
 }
@@ -36,7 +36,7 @@ export async function requestConfirmationCode(formData: RequestConfirmationCodeF
         const {data} = await api.post<string>(url, formData)
         return data;
     } catch (e) {
-        if (isAxiosError(e) && e.message)
+        if (isAxiosError(e) && e.response)
             throw new Error(e.response.data.error)
     }
 }
@@ -46,10 +46,10 @@ export async function authenticateUser(formData: UserLoginForm) {
         const url = '/auth/login'
         const {data} = await api.post<string>(url, formData)
         console.log("🚀 ~ authenticateUser ~ data: ", data);
-        localStorage.setItem('AUTH_TOKEN',data)
+        localStorage.setItem('AUTH_TOKEN', data)
         return data;
     } catch (e) {
-        if (isAxiosError(e) && e.message)
+        if (isAxiosError(e) && e.response)
             throw new Error(e.response.data.error)
     }
 }
@@ -60,7 +60,7 @@ export async function forgotPassword(formData: ForgotPasswordForm) {
         const {data} = await api.post<string>(url, formData)
         return data;
     } catch (e) {
-        if (isAxiosError(e) && e.message)
+        if (isAxiosError(e) && e.response)
             throw new Error(e.response.data.error)
     }
 
@@ -72,20 +72,35 @@ export async function validateToken(formData: ConfirmToken) {
         const {data} = await api.post<string>(url, formData)
         return data;
     } catch (e) {
-        if (isAxiosError(e) && e.message)
+        if (isAxiosError(e) && e.response)
             throw new Error(e.response.data.error)
     }
 
 }
 
-export async function updatePasswordWithToken({formData, token}: { formData: NewPasswordForm, token: ConfirmToken['token'] }) {
+export async function updatePasswordWithToken({formData, token}: {
+    formData: NewPasswordForm,
+    token: ConfirmToken['token']
+}) {
     try {
         const url = `/auth/update-password/${token}`
         const {data} = await api.post<string>(url, formData)
         return data;
     } catch (e) {
-        if (isAxiosError(e) && e.message)
+        if (isAxiosError(e) && e.response)
             throw new Error(e.response.data.error)
     }
 
+}
+
+export async function getUser() {
+    console.log('Hola desde getuser')
+    try {
+        const {data} = await api<User>('/auth/user')
+    
+        return data
+    } catch (e) {
+        if (isAxiosError(e) && e.response)
+            throw new Error(e.response.data.error)
+    }
 }

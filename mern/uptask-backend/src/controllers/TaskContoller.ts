@@ -1,4 +1,4 @@
-import type { Request, Response, NextFunction } from "express";
+import type {Request, Response, NextFunction} from "express";
 import Project from "../models/Project";
 import Task from "../models/Task";
 
@@ -14,7 +14,7 @@ export class TaskController {
 
         } catch (error) {
             console.log("🚀 ~ TaskController ~ error:", error)
-            res.status(500).json({ error: 'Hubo un error' })
+            res.status(500).json({error: 'Hubo un error'})
 
 
         }
@@ -22,22 +22,24 @@ export class TaskController {
 
     static getProjectTask = async (req: Request, res: Response) => {
         try {
-            const tasks = await Task.find({ project: req.project.id }).populate('project')
+            const tasks = await Task.find({project: req.project.id}).populate('project')
             res.json(tasks)
 
         } catch (error) {
             console.log("🚀 ~ TaskController ~ error:", error)
-            res.status(500).json({ error: 'Hubo un error' })
+            res.status(500).json({error: 'Hubo un error'})
 
         }
     }
 
     static getTaskById = async (req: Request, res: Response) => {
         try {
-            res.json(req.task)
+            const task = await Task.findById(req.task.id)
+                .populate({path: 'completedBy.user', select: 'id name email'})
+            res.json(task)
         } catch (error) {
             console.log("🚀 ~ TaskController ~ error:", error)
-            res.status(500).json({ error: 'Hubo un error' })
+            res.status(500).json({error: 'Hubo un error'})
 
 
         }
@@ -51,7 +53,7 @@ export class TaskController {
             res.send('Tarea Actualizada correctamente')
         } catch (error) {
             console.log("🚀 ~ TaskController  ~ error:", error)
-            res.status(500).json({ error: 'Hubo un error' })
+            res.status(500).json({error: 'Hubo un error'})
 
 
         }
@@ -63,7 +65,7 @@ export class TaskController {
 
             if (req.task.project.toString() !== req.project.id) {
                 const error = new Error('acción no valida');
-                return res.status(400).json({ error: error.message })
+                return res.status(400).json({error: error.message})
             }
             req.project.tasks = req.project.tasks.filter(task => task.toString() !== req.task.id.toString())
 
@@ -71,7 +73,7 @@ export class TaskController {
             res.send('Tarea Eliminada correctamente')
         } catch (error) {
             console.log("🚀 ~ TaskController ~ error:", error)
-            res.status(500).json({ error: 'Hubo un error' })
+            res.status(500).json({error: 'Hubo un error'})
 
 
         }
@@ -79,14 +81,19 @@ export class TaskController {
 
     static updateStatus = async (req: Request, res: Response) => {
         try {
-            const { status } = req.body
+            const {status} = req.body
             req.task.status = status
+            const data = {
+                user: req.user.id,
+                status
+            }
+            req.task.completedBy.push(data)
             await req.task.save()
             res.send('Tarea actualizada correctamente')
 
         } catch (error) {
             console.log("🚀 ~ TaskController ~ error:", error)
-            res.status(500).json({ error: 'Hubo un error al actualizar el estado' })
+            res.status(500).json({error: 'Hubo un error al actualizar el estado'})
 
         }
     }
