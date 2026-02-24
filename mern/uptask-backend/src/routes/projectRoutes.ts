@@ -1,12 +1,13 @@
-import { Router } from "express";
-import { ProjectController } from "../controllers/ProjectController";
-import { body, param } from "express-validator";
-import { handleInputErrors } from "../middleware/validation";
-import { TaskController } from "../controllers/TaskContoller";
-import { validateProjectExist } from "../middleware/project";
+import {Router} from "express";
+import {ProjectController} from "../controllers/ProjectController";
+import {body, param} from "express-validator";
+import {handleInputErrors} from "../middleware/validation";
+import {TaskController} from "../controllers/TaskContoller";
+import {validateProjectExist} from "../middleware/project";
 import {hasAuthorization, taskBelongsToProject, taskExists} from "../middleware/task";
 import {authenticate} from "../middleware/auth";
 import {TeamMemberController} from "../controllers/TeamController";
+import {NoteController} from "../controllers/NoteController";
 
 const router = Router()
 
@@ -15,7 +16,7 @@ router.use(authenticate)
 router.param('projectId', validateProjectExist)
 
 
-router.get('/',  ProjectController.getAllProjects)
+router.get('/', ProjectController.getAllProjects)
 
 router.get('/:id',
     param('id').isMongoId().withMessage('Id no válido'),
@@ -53,7 +54,6 @@ router.post('/:projectId/tasks',
     TaskController.createTask)
 
 
-
 router.get('/:projectId/tasks',
     TaskController.getProjectTask
 )
@@ -88,7 +88,6 @@ router.post('/:projectId/tasks/:taskId/status',
     body('status').notEmpty().withMessage('El estado es obligatorio'),
     TaskController.updateStatus,
     handleInputErrors,
-
 )
 /*Routes for teams*/
 
@@ -96,7 +95,7 @@ router.post('/:projectId/team/find',
     body('email').isEmail().toLowerCase().withMessage('E-mail no valido'),
     handleInputErrors,
     TeamMemberController.findMemberByEmail
-    )
+)
 
 
 router.post('/:projectId/team/',
@@ -113,4 +112,21 @@ router.delete('/:projectId/team/:userId',
 router.get('/:projectId/team/',
     TeamMemberController.getProjectTeam
 )
+
+/* Routes For Notes*/
+router.post('/:projectId/task/:taskId/notes',
+    body('content').notEmpty().withMessage('El contenido de la nota es obligatorio'),
+    handleInputErrors,
+    NoteController.createNote
+)
+router.get('/:projectId/task/:taskId/notes',
+    NoteController.getTaskNotes
+)
+
+router.delete('/:projectId/task/:taskId/notes/:noteId',
+    param('noteId').isMongoId().withMessage('id no valido'),
+    handleInputErrors,
+    NoteController.deleteNote
+)
+
 export default router
