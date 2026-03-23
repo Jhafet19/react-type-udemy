@@ -2,6 +2,7 @@ import {PrismaClient} from '../../../src/generated/prisma/client'
 import {Pool} from 'pg'
 import {PrismaPg} from '@prisma/adapter-pg'
 import ProductCart from "@/components/products/ProductCart";
+import Heading from "@/components/ui/Heading";
 
 
 const adapter = new PrismaPg({
@@ -29,7 +30,7 @@ export default async function OrderPage({params}: { params: { category: string }
 
     return (
         <>
-            <h1 className="text-2xl my-10">Elige y personaliza tu pedido a continuación </h1>
+            <Heading >Elige y personaliza tu pedido a continuación </Heading>
             <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4 items-start ">
 
                 {products.map(product => (
