@@ -2,7 +2,6 @@ import React from 'react'
 import Heading from "@/components/ui/Heading";
 import prisma from "@/src/lib/prisma";
 import ProductTable from "@/components/products/ProductTable";
-import Link from "next/link";
 import ProductsSearchForm from "@/components/products/ProductsSearchForm";
 
 async function searchProducts(searchTerm: string) {
