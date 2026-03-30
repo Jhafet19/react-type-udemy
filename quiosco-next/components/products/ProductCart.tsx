@@ -1,5 +1,5 @@
 import {Product} from "@/src/generated/prisma/client";
-import {formatCurrency} from "@/src/utils";
+import {formatCurrency, getImagePath} from "@/src/utils";
 import Image from "next/image";
 import AddProcuctButton from "@/components/products/AddProcuctButton";
 
@@ -8,13 +8,15 @@ type ProductCartProps = {
 }
 
 export default function ProductCart({product}: ProductCartProps) {
+
+    const imagePath = getImagePath(product.image)
     return (
         <div className="border bg-white">
 
             <Image
                 width={400}
                 height={500}
-                src={`/products/${product.image}.jpg`} alt={`Imagen platillo ${product.name}`}
+                src={imagePath} alt={`Imagen platillo ${product.name}`}
 
 
             />
