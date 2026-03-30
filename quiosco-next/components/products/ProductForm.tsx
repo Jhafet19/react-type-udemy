@@ -1,3 +1,4 @@
+import ImageUpload from "@/components/products/ImageUpload";
 
 
 async function getCategories() {
@@ -60,6 +61,7 @@ export default async function ProductForm() {
 
                 </select>
             </div>
+            <ImageUpload/>
         </>
     )
 }
